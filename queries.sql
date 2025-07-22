@@ -101,3 +101,11 @@ GROUP BY role
 HAVING AVG(salary) > 100000;
 
 UPDATE training_table SET role='Product Engineer' WHERE name='Sneha Reddy'
+
+SELECT DISTINCT * FROM training_table
+
+INSERT INTO training_table(name,role,salary) VALUES( 'Peter Griffin','Social Service','69000')
+
+SELECT DISTINCT name FROM training_table ORDER BY name;
+
+SELECT DISTINCT role FROM training_table ORDER BY role;
