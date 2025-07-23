@@ -109,3 +109,34 @@ INSERT INTO training_table(name,role,salary) VALUES( 'Peter Griffin','Social Ser
 SELECT DISTINCT name FROM training_table ORDER BY name;
 
 SELECT DISTINCT role FROM training_table ORDER BY role;
+
+CREATE TABLE authors (
+    author_id SERIAL PRIMARY KEY,
+    author_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE books (
+    book_id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author_id INTEGER NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES authors(author_id)
+);
+
+INSERT INTO authors (author_name) VALUES
+('J.K. Rowling'),
+('George R.R. Martin'),
+('J.R.R. Tolkien');
+
+INSERT INTO books (title, author_id) VALUES
+('Harry Potter and the Sorcerer''s Stone', 1), -- Belongs to author with ID 1
+('A Game of Thrones', 2),                     -- Belongs to author with ID 2
+('The Hobbit', 3); 
+
+SELECT * FROM books JOIN authors ON books.author_id = authors.author_id;
+
+INSERT INTO books (title, author_id) VALUES
+('Harry Potter and the Chamber of Secrets', 1),
+('A Clash of Kings', 2),
+('The Fellowship of the Ring', 3),
+('Harry Potter and the Prisoner of Azkaban', 1),
+('The Lord of the Rings', 3);
