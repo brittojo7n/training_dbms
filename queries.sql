@@ -128,8 +128,8 @@ INSERT INTO authors (author_name) VALUES
 ('J.R.R. Tolkien');
 
 INSERT INTO books (title, author_id) VALUES
-('Harry Potter and the Sorcerer''s Stone', 1), -- Belongs to author with ID 1
-('A Game of Thrones', 2),                     -- Belongs to author with ID 2
+('Harry Potter and the Sorcerer''s Stone', 1),
+('A Game of Thrones', 2),
 ('The Hobbit', 3); 
 
 SELECT * FROM books JOIN authors ON books.author_id = authors.author_id;
@@ -140,3 +140,51 @@ INSERT INTO books (title, author_id) VALUES
 ('The Fellowship of the Ring', 3),
 ('Harry Potter and the Prisoner of Azkaban', 1),
 ('The Lord of the Rings', 3);
+
+SELECT * FROM books b JOIN authors a ON b.author_id = a.author_id;
+
+CREATE TABLE customers (
+    customer_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    join_date DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES customers(customer_id),
+    order_date DATE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'processing'
+);
+
+INSERT INTO customers (name, email, join_date) VALUES
+('John Smith', 'john@example.com', '2023-01-15'),
+('Sarah Johnson', 'sarah@example.com', '2023-02-20'),
+('Mike Brown', 'mike@example.com', '2023-03-10'),
+('Emily Davis', 'emily@example.com', '2023-01-05');
+
+INSERT INTO orders (customer_id, order_date, amount, status) VALUES
+(1, '2023-04-01', 150.00, 'completed'),
+(1, '2023-04-15', 75.50, 'completed'),
+(2, '2023-04-05', 200.00, 'completed'),
+(3, '2023-04-10', 50.00, 'cancelled'),
+(1, '2023-05-02', 125.00, 'processing'),
+(4, '2023-05-01', 300.00, 'completed');
+
+SELECT * FROM customers;
+SELECT * FROM orders;
+
+WITH customer_totals AS (
+    SELECT 
+        customer_id,
+        SUM(amount) AS total_spent
+    FROM orders
+    GROUP BY customer_id
+) SELECT 
+    c.name,
+    c.email,
+    ct.total_spent
+FROM customers c
+JOIN customer_totals ct ON c.customer_id = ct.customer_id
+ORDER BY ct.total_spent DESC;
