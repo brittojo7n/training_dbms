@@ -306,80 +306,6 @@ INSERT INTO books (title, author_id, genre) VALUES
 ('Foundation', 7, 'Science Fiction'),
 ('Murder on the Orient Express', 5, 'Mystery');
 
-SELECT b.title, a.author_name, b.genre
-FROM books b JOIN authors a ON b.author_id = a.author_id
-ORDER BY a.author_name, b.title;
-
-SELECT author_name, genre, COUNT(title) 
-FROM authors 
-JOIN books ON authors.author_id = books.author_id 
-GROUP BY genre, author_name
-ORDER BY author_name, genre;
-
-SELECT author_name, genre, COUNT(title) AS NUM_OF_BOOKS 
-FROM books b 
-JOIN authors a ON b.author_id = a.author_id 
-WHERE genre = 'Fantasy'
-GROUP BY author_name, genre
-HAVING COUNT(title) > 2
-ORDER BY author_name, genre;
-
-WITH BooksCount AS (
-    SELECT author_name, COUNT(book_id) AS num_of_books
-    FROM authors a
-    JOIN books b ON a.author_id = b.author_id
-    GROUP BY author_name
-)
-SELECT AVG(num_of_books) AS avg_num_of_books
-FROM BooksCount;
-
-INSERT INTO books (title, author_id, genre) 
-VALUES('Harry Potter and the Goblet of Fire', 1, 'Fantasy')
-
-WITH BookCounts AS (
-    SELECT author_id, COUNT(book_id) AS book_count
-    FROM books
-    GROUP BY author_id
-)
-SELECT MAX(book_count) FROM BookCounts;
-
-WITH BookCounts AS (
-    SELECT author_id, COUNT(book_id) AS book_count
-    FROM books
-    GROUP BY author_id
-)
-SELECT MIN(book_count) FROM BookCounts;
-
-WITH BookCounts AS (
-    SELECT author_id, COUNT(book_id) AS book_count
-    FROM books
-    GROUP BY author_id
-)
-SELECT a.author_name, b.title, b.genre
-FROM authors a
-JOIN books b ON a.author_id = b.author_id
-WHERE a.author_id IN (
-    SELECT author_id FROM BookCounts WHERE book_count = (SELECT MAX(book_count) FROM BookCounts)
-)
-ORDER BY b.title;
-
-WITH BookCounts AS (
-    SELECT author_id, COUNT(book_id) AS book_count
-    FROM books
-    GROUP BY author_id
-)
-SELECT author_name, title, genre FROM authors a
-JOIN books b ON a.author_id = b.author_id
-WHERE a.author_id IN (
-    SELECT author_id 
-    FROM BookCounts 
-    WHERE book_count = (
-        SELECT MIN(book_count) 
-        FROM BookCounts
-    )
-)
-ORDER BY b.title;
-
 INSERT INTO authors (author_id, author_name) VALUES
 (8, 'Stephen King'),
 (9, 'Neil Gaiman'),
@@ -644,3 +570,77 @@ INSERT INTO books (title, author_id, genre) VALUES
 ('The Fraud', 15, 'Historical Fiction'),
 ('Feel Free', 15, 'Non-Fiction'),
 ('Intimations', 15, 'Non-Fiction');
+
+SELECT b.title, a.author_name, b.genre
+FROM books b JOIN authors a ON b.author_id = a.author_id
+ORDER BY a.author_name, b.title;
+
+SELECT author_name, genre, COUNT(title) 
+FROM authors 
+JOIN books ON authors.author_id = books.author_id 
+GROUP BY genre, author_name
+ORDER BY author_name, genre;
+
+SELECT author_name, genre, COUNT(title) AS NUM_OF_BOOKS 
+FROM books b 
+JOIN authors a ON b.author_id = a.author_id 
+WHERE genre = 'Fantasy'
+GROUP BY author_name, genre
+HAVING COUNT(title) > 2
+ORDER BY author_name, genre;
+
+WITH BooksCount AS (
+    SELECT author_name, COUNT(book_id) AS num_of_books
+    FROM authors a
+    JOIN books b ON a.author_id = b.author_id
+    GROUP BY author_name
+)
+SELECT AVG(num_of_books) AS avg_num_of_books
+FROM BooksCount;
+
+INSERT INTO books (title, author_id, genre) 
+VALUES('Harry Potter and the Goblet of Fire', 1, 'Fantasy')
+
+WITH BookCounts AS (
+    SELECT author_id, COUNT(book_id) AS book_count
+    FROM books
+    GROUP BY author_id
+)
+SELECT MAX(book_count) FROM BookCounts;
+
+WITH BookCounts AS (
+    SELECT author_id, COUNT(book_id) AS book_count
+    FROM books
+    GROUP BY author_id
+)
+SELECT MIN(book_count) FROM BookCounts;
+
+WITH BookCounts AS (
+    SELECT author_id, COUNT(book_id) AS book_count
+    FROM books
+    GROUP BY author_id
+)
+SELECT a.author_name, b.title, b.genre
+FROM authors a
+JOIN books b ON a.author_id = b.author_id
+WHERE a.author_id IN (
+    SELECT author_id FROM BookCounts WHERE book_count = (SELECT MAX(book_count) FROM BookCounts)
+)
+ORDER BY b.title;
+
+WITH BookCounts AS (
+    SELECT author_id, COUNT(book_id) AS book_count
+    FROM books
+    GROUP BY author_id
+)
+SELECT author_name, title, genre FROM authors a
+JOIN books b ON a.author_id = b.author_id
+WHERE a.author_id IN (
+    SELECT author_id 
+    FROM BookCounts 
+    WHERE book_count = (
+        SELECT MIN(book_count) 
+        FROM BookCounts
+    )
+)
+ORDER BY b.title;
