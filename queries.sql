@@ -644,3 +644,260 @@ WHERE a.author_id IN (
     )
 )
 ORDER BY b.title;
+
+INSERT INTO authors (author_id, author_name) VALUES(17, 'Anonym');
+INSERT INTO authors (author_id, author_name) VALUES
+(18, 'Anonymous'),
+(19, 'Anonymouse'),
+(20, 'Unknown');
+
+SELECT author_name, title 
+FROM authors a
+JOIN books b ON a.author_id = b.author_id;
+
+select * from training_table;
+
+CREATE TABLE training_table1(
+    id SERIAL PRIMARY KEY,
+    role VARCHAR(30),
+    department VARCHAR(30)
+);
+
+INSERT INTO training_table1(role, department) VALUES
+('Developer', 'Development'),
+('Data Analyst', 'Data Science'),
+('Manger', 'Management'),
+('DevOps Engineer', 'Operations'),
+('UI/UX Designer', 'Designing')
+
+SELECT * FROM training_table;
+
+INSERT INTO training_table1(role, department) VALUES
+('Data Scientist', 'Data Science'),
+('Sales Manager', 'Sales and Marketing'),
+('Director', 'Management'),
+('C.E.O.', 'Executive')
+
+SELECT department, t.role
+FROM training_table1 t1 
+JOIN training_table t ON t1.role = t.role;
+
+SELECT department, t.role
+FROM training_table1 t1 
+LEFT JOIN training_table t ON t1.role = t.role;
+
+SELECT department, t.role
+FROM training_table1 t1 
+RIGHT JOIN training_table t ON t1.role = t.role;
+
+SELECT department, t.role
+FROM training_table1 t1 
+FULL JOIN training_table t ON t1.role = t.role;
+
+SELECT department, t.role
+FROM training_table1 t1 
+CROSS JOIN training_table t;
+
+SELECT department, t1.role
+FROM training_table1 t1 
+CROSS JOIN training_table t;
+
+SELECT department, t.role
+FROM training_table1 t1
+INNER JOIN training_table t ON t1.role = t.role;
+
+SELECT t1.department, t.role
+FROM training_table1 t1
+INNER JOIN training_table t ON t1.id = t.id AND t1.role = t.role;
+
+SELECT department, role
+FROM training_table1 t1
+NATURAL JOIN training_table t;
+
+SELECT department, role
+FROM training_table1 t1
+NATURAL LEFT JOIN training_table t;
+
+SELECT department, role
+FROM training_table1 t1
+NATURAL RIGHT JOIN training_table t;
+
+SELECT department, role
+FROM training_table1 t1
+NATURAL FULL JOIN training_table t;
+
+SELECT department, role
+FROM training_table1 t1
+NATURAL INNER JOIN training_table t;
+
+SELECT t.role, department
+FROM training_table t
+RIGHT JOIN training_table1 t1 ON t.role = t1.role;
+
+SELECT*FROM training_table;
+
+INSERT INTO training_table(name,salary) VALUES
+('Peter Parker', 65000),
+('Vishal Kannan', 69420),
+('Dr. Diwagar', 89000);
+
+SELECT * FROM training_table;
+
+SELECT name, COALESCE(role, 'UNKNOWN') AS role FROM training_table;
+
+SELECT
+    t1.department,
+    COUNT(t.id) AS number_of_employees,
+    CAST(AVG(t.salary) AS INTEGER) AS average_salary
+FROM
+    training_table AS t
+INNER JOIN
+    training_table1 AS t1 ON t.role = t1.role
+GROUP BY
+    t1.department
+ORDER BY
+    average_salary DESC;
+
+SELECT
+    name,
+    role,
+    salary,
+    CASE
+        WHEN role NOT IN (
+            'Manager', 'Product Manager', 'Regional Manager', 'Scrum Master',
+            'Cloud Architect', 'Solutions Architect', 'AI Researcher'
+        ) AND salary < 120000 THEN 'Eligible'
+        ELSE 'Not Eligible'
+    END AS bonus_status
+FROM
+    training_table;
+
+SELECT
+    name,
+    salary,
+    role,
+    CASE
+        WHEN salary < 80000 THEN 'Entry-Level'
+        WHEN salary >= 80000 AND salary < 110000 THEN 'Mid-Level'
+        WHEN salary >= 110000 AND salary < 140000 THEN 'Senior-Level'
+        ELSE 'Executive-Level'
+    END AS salary_band
+FROM
+    training_table;
+
+SELECT
+    CASE
+        WHEN salary < 80000 THEN 'Entry-Level'
+        WHEN salary >= 80000 AND salary < 110000 THEN 'Mid-Level'
+        WHEN salary >= 110000 AND salary < 140000 THEN 'Senior-Level'
+        ELSE 'Executive-Level'
+    END AS salary_band,
+    COUNT(id) AS number_of_employees,
+    CAST(AVG(salary) AS INTEGER) AS average_salary_in_band
+FROM
+    training_table
+WHERE
+    salary IS NOT NULL
+GROUP BY
+    salary_band
+ORDER BY
+    average_salary_in_band;
+
+SELECT
+    CASE
+        WHEN salary < 80000 THEN 'Entry-Level'
+        WHEN salary >= 80000 AND salary < 110000 THEN 'Mid-Level'
+        WHEN salary >= 110000 AND salary < 140000 THEN 'Senior-Level'
+        ELSE 'Executive-Level'
+    END AS salary_band,
+    COUNT(id) AS number_of_employees,
+    CAST(AVG(salary) AS INTEGER) AS average_salary_in_band
+FROM
+    training_table
+WHERE
+    salary IS NOT NULL
+GROUP BY
+    salary_band
+HAVING
+    COUNT(id) > 3 AND AVG(salary) > 100000
+ORDER BY
+    average_salary_in_band;
+
+SELECT
+    e1.id,
+    e2.id,
+    e1.name AS employee_1,
+    e2.name AS employee_2,
+    e1.role
+FROM
+    training_table AS e1
+JOIN
+    training_table AS e2 ON e1.role = e2.role AND e1.id > e2.id
+WHERE
+    e1.name IS NOT NULL AND e2.name IS NOT NULL
+ORDER BY
+    e1.role, e1.name;
+
+SELECT
+    a.author_name, book_id
+FROM
+    authors AS a
+LEFT JOIN
+    books AS b ON a.author_id = b.author_id
+WHERE
+    b.book_id IS NULL
+ORDER BY
+    a.author_name;
+
+WITH latest_books AS (
+    SELECT
+        a.author_name
+        genre,
+        MAX(book_id) AS max_book_id
+    FROM
+        books b
+    JOIN
+        authors a ON b.author_id = a.author_id
+    WHERE
+        genre IS NOT NULL
+    GROUP BY
+        a.author_name
+)
+SELECT
+    b.genre,
+    b.title,
+    a.author_name
+FROM
+    books AS b
+JOIN
+    latest_books AS lb ON b.book_id = lb.max_book_id
+JOIN
+    authors AS a ON b.author_id = a.author_id
+ORDER BY
+    a.author_name;
+
+WITH latest_books AS (
+    SELECT
+        genre,
+        MAX(book_id) AS max_book_id
+    FROM
+        books b
+    JOIN
+        authors a ON b.author_id = a.author_id
+    WHERE
+        genre IS NOT NULL
+    GROUP BY
+        genre
+)
+SELECT
+    a.author_name,
+    b.title,
+    b.genre
+FROM
+    books AS b
+JOIN
+    latest_books AS lb ON b.book_id = lb.max_book_id
+JOIN
+    authors AS a ON b.author_id = a.author_id
+ORDER BY
+    a.author_name;
