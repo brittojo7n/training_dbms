@@ -78,3 +78,72 @@ RETURN
 );
 
 SELECT * FROM dbo.fnGetEmployeesByHireDate('2022-01-15');
+
+
+
+ALTER TABLE Employees
+ADD IsActive BIT DEFAULT 1;
+
+
+
+UPDATE Employees SET IsActive = 1;
+
+
+
+CREATE PROCEDURE spDeactivateEmployee
+    @EmployeeID INT
+AS
+BEGIN
+    UPDATE Employees
+    SET IsActive = 0 
+    WHERE EmployeeID = @EmployeeID;
+END;
+
+EXEC spDeactivateEmployee @EmployeeID = 1;
+
+SELECT * FROM Employees WHERE EmployeeID = 1;
+
+SELECT * FROM Employees;
+
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY,
+    DepartmentName NVARCHAR(50),
+    Location NVARCHAR(50)
+);
+
+ALTER TABLE Employees ADD DepartmentID INT;
+
+INSERT INTO Departments (DepartmentID, DepartmentName, Location) VALUES
+(10, 'Human Resources', 'New York'),
+(20, 'IT', 'Chicago'),
+(30, 'Sales', 'New York');
+
+INSERT INTO Employees (EmployeeID,FirstName, LastName, Salary, DepartmentID) VALUES
+(5, 'John', 'Doe', 60000.00, 10),
+(6, 'Jane', 'Smith', 85000.00, 20),
+(7, 'Peter', 'Jones', 95000.00, 20),
+(8, 'Mary', 'Williams', 72000.00, 30);
+
+CREATE FUNCTION fnGetEmployeesByLocation
+(
+    @Location NVARCHAR(50)
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT
+        E.EmployeeID,
+        E.FirstName + ' ' + E.LastName AS FullName,
+        D.DepartmentName,
+        E.Salary,
+        D.Location
+    FROM
+        Employees AS E
+    JOIN 
+        Departments AS D ON E.DepartmentID = D.DepartmentID
+    WHERE
+        D.Location = @Location
+);
+
+SELECT * FROM dbo.fnGetEmployeesByLocation('Chicago');
